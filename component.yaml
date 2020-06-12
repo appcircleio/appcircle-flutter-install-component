@@ -1,7 +1,7 @@
 platform: Common
 buildPlatform: Flutter
 displayName: Install Flutter
-description: "Install spesificed flutter version. Defaults to: stable. You can use any available tag or branch in Flutter SDK repo."
+description: "Select a specific Flutter version for the build. Defaults to: stable. You can use any available tag or branch in the Flutter SDK repo."
 inputs:
 - key: "AC_SELECTED_FLUTTER_VERSION"
   isRequired: false
