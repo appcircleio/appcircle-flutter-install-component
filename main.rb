@@ -28,6 +28,7 @@ def run_command(command)
 
     unless status.success?
         puts stderr_str
+        raise stderr_str
     end
 end
 
