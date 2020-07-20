@@ -12,7 +12,7 @@ flutter_repo_url = "https://github.com/flutter/flutter.git"
 puts "Selected flutter version is #{ac_flutter_version}"
 
 def run_command(command)
-    puts "@[command] #{command}"
+    puts "@@[command] #{command}"
     status = nil
     stdout_str = nil
     stderr_str = nil
