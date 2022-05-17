@@ -5,8 +5,14 @@ def get_env_variable(key)
 	return (ENV[key] == nil || ENV[key] == "") ? nil : ENV[key]
 end
 
+def get_version(component_version,config_version)
+    return config_version == nil ? component_version : config_version
+end
+
 env_var_path = get_env_variable("AC_ENV_FILE_PATH") || abort('Missing environment variable path.')
-ac_flutter_version = get_env_variable("AC_SELECTED_FLUTTER_VERSION") || "stable"
+ac_component_version = get_env_variable("AC_SELECTED_FLUTTER_VERSION") || "stable"
+ac_config_version = get_env_variable("AC_FLUTTER_VERSION")
+ac_flutter_version = get_version(ac_component_version,ac_config_version)
 flutter_repo_url = "https://github.com/flutter/flutter.git"
 
 puts "Selected flutter version is #{ac_flutter_version}"
