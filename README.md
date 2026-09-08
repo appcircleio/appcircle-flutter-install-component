@@ -7,3 +7,13 @@ Required Input Variables
 
 Output Variables
 - `$PATH`: Added Flutter tool to your path.
+
+## Running tests
+
+Requires the [RSpec](https://rspec.info) gem and the Ruby standard library (Coverage, Open3). No Gemfile or Bundler needed.
+
+```bash
+ruby test/test_main.rb
+```
+
+The tests never clone the real Flutter SDK and never invoke the real `git` or `flutter` binaries: the subprocess cases run the step inside a temp directory with stub executables on `PATH` and assert the composed commands. A coverage report for `main.rb` is printed at the end of each run.

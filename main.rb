@@ -9,6 +9,8 @@ def get_version(component_version,config_version)
     return config_version == nil ? component_version : config_version
 end
 
+if __FILE__ == $PROGRAM_NAME
+
 env_var_path = get_env_variable("AC_ENV_FILE_PATH") || abort('Missing environment variable path.')
 ac_component_version = get_env_variable("AC_SELECTED_FLUTTER_VERSION") || "stable"
 ac_config_version = get_env_variable("AC_FLUTTER_VERSION")
@@ -16,6 +18,8 @@ ac_flutter_version = get_version(ac_component_version,ac_config_version)
 flutter_repo_url = "https://github.com/flutter/flutter.git"
 
 puts "Selected flutter version is #{ac_flutter_version}"
+
+end # if __FILE__ == $PROGRAM_NAME
 
 def run_command(command)
     puts "@@[command] #{command}"
@@ -38,6 +42,8 @@ def run_command(command)
     end
 end
 
+if __FILE__ == $PROGRAM_NAME
+
 run_command("git clone -b #{ac_flutter_version} #{flutter_repo_url}")
 
 pwd = Dir.pwd
@@ -52,3 +58,5 @@ open(env_var_path, 'a') { |f|
 }
 
 exit 0
+
+end # if __FILE__ == $PROGRAM_NAME
