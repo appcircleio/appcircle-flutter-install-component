@@ -1,12 +1,12 @@
 platform: Common
 buildPlatform: Flutter
 displayName: Flutter Install
-description: "Select a specific Flutter version for the build. Defaults to: stable. You can use any available tag or branch in the Flutter SDK repo."
+description: "Installs the selected Flutter SDK version from the official Flutter release archives. Defaults to: stable. Set FLUTTER_STORAGE_BASE_URL to install from an internal mirror."
 inputs:
 - key: "AC_SELECTED_FLUTTER_VERSION"
   isRequired: false
   title: Selected Flutter Version
-  description: "Specifies the Flutter version to install. Defaults to: stable. The version you set on config section will override this setting."
+  description: "Flutter version or channel (stable, beta). Branches and commits require GitHub access. Defaults to: stable. The version you set on config section will override this setting."
   helpText:
 outputs:
 - key: "PATH"
