@@ -6,7 +6,12 @@ inputs:
 - key: "AC_SELECTED_FLUTTER_VERSION"
   isRequired: false
   title: Selected Flutter Version
-  description: "Specifies the Flutter version to install. Defaults to: stable. The version you set on config section will override this setting."
+  description: "Flutter version or channel (stable, beta). Branches and commits require GitHub access. Defaults to: stable. The version you set on config section will override this setting."
+  helpText:
+- key: "AC_FLUTTER_STORAGE_BASE_URL"
+  isRequired: false
+  title: Flutter Storage Base URL
+  description: "Base URL of the Flutter release archives. Defaults to: https://storage.googleapis.com. Set it to an internal mirror to install Flutter without internet access."
   helpText:
 outputs:
 - key: "PATH"
