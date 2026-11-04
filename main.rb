@@ -17,7 +17,7 @@ ac_component_version = get_env_variable("AC_SELECTED_FLUTTER_VERSION") || "stabl
 ac_config_version = get_env_variable("AC_FLUTTER_VERSION")
 ac_flutter_version = get_version(ac_component_version,ac_config_version)
 flutter_repo_url = "https://github.com/flutter/flutter.git"
-ac_flutter_storage_base_url = (get_env_variable("AC_FLUTTER_STORAGE_BASE_URL") || "https://storage.googleapis.com").chomp("/")
+ac_flutter_storage_base_url = (get_env_variable("AC_FLUTTER_STORAGE_BASE_URL") || get_env_variable("FLUTTER_STORAGE_BASE_URL") || "https://storage.googleapis.com").chomp("/")
 flutter_releases_url = "#{ac_flutter_storage_base_url}/flutter_infra_release/releases"
 # hw.optional.arm64 is 1 on Apple silicon, also when Ruby runs under Rosetta.
 flutter_arch = `sysctl -n hw.optional.arm64 2>/dev/null`.strip == "1" ? "arm64" : "x64"
@@ -103,7 +103,7 @@ File.write("#{flutter_path}/bin/cache/flutter_version_check.stamp", JSON.generat
 ENV["PATH"] = "#{ENV["PATH"]}:#{flutter_path}/bin/"
 
 puts "PATH=#{ENV["PATH"]}"
-run_command("flutter doctor")
+run_command("flutter --version")
 
 # Write Environment Variable
 open(env_var_path, 'a') { |f|
