@@ -19,8 +19,21 @@ ac_flutter_version = get_version(ac_component_version,ac_config_version)
 flutter_repo_url = "https://github.com/flutter/flutter.git"
 ac_flutter_storage_base_url = (get_env_variable("AC_FLUTTER_STORAGE_BASE_URL") || get_env_variable("FLUTTER_STORAGE_BASE_URL") || "https://storage.googleapis.com").chomp("/")
 flutter_releases_url = "#{ac_flutter_storage_base_url}/flutter_infra_release/releases"
-# hw.optional.arm64 is 1 on Apple silicon, also when Ruby runs under Rosetta.
-flutter_arch = `sysctl -n hw.optional.arm64 2>/dev/null`.strip == "1" ? "arm64" : "x64"
+# The release manifest, the archive format and the architecture depend on the runner's operating system.
+case RUBY_PLATFORM
+when /darwin/
+    flutter_os = "macos"
+    # hw.optional.arm64 is 1 on Apple silicon, also when Ruby runs under Rosetta.
+    flutter_arch = `sysctl -n hw.optional.arm64 2>/dev/null`.strip == "1" ? "arm64" : "x64"
+    flutter_archive_file = "flutter.zip"
+when /linux/
+    flutter_os = "linux"
+    # Flutter publishes Linux release archives only for x86-64.
+    flutter_arch = "x64"
+    flutter_archive_file = "flutter.tar.xz"
+else
+    abort("Flutter Install supports only macOS and Linux runners. Unsupported platform: #{RUBY_PLATFORM}")
+end
 
 puts "Selected flutter version is #{ac_flutter_version}"
 
@@ -60,15 +73,16 @@ end
 
 manifest = nil
 begin
-    run_command("curl -fsSL --retry 3 -o releases_macos.json #{flutter_releases_url}/releases_macos.json")
-    manifest = JSON.parse(File.read("releases_macos.json"))
+    manifest_file = "releases_#{flutter_os}.json"
+    run_command("curl -fsSL --retry 3 -o #{manifest_file} #{flutter_releases_url}/#{manifest_file}")
+    manifest = JSON.parse(File.read(manifest_file))
 rescue StandardError => e
     puts "Flutter release manifest could not be read: #{e}"
 end
 release = manifest.nil? ? nil : find_release(manifest, ac_flutter_version, flutter_arch)
 
 if release
-    puts "Resolved flutter version is #{release["version"]} (#{release["channel"]}, #{flutter_arch})"
+    puts "Resolved flutter version is #{release["version"]} (#{release["channel"]}, #{flutter_os}, #{flutter_arch})"
     flutter_sdk_path = "#{Dir.home}/flutter-sdk/#{release["version"]}"
     sha_file = "#{flutter_sdk_path}/.sha256"
     if File.exist?(sha_file) && File.read(sha_file).strip == release["sha256"]
@@ -76,14 +90,18 @@ if release
     else
         archive_url = "#{flutter_releases_url}/#{release["archive"]}"
         puts "Archive URL: #{archive_url}"
-        run_command("curl -fsSL --retry 3 -o flutter.zip #{archive_url}")
-        checksum = Digest::SHA256.file("flutter.zip").hexdigest
+        run_command("curl -fsSL --retry 3 -o #{flutter_archive_file} #{archive_url}")
+        checksum = Digest::SHA256.file(flutter_archive_file).hexdigest
         raise "Checksum mismatch: expected #{release["sha256"]}, got #{checksum}" unless checksum == release["sha256"]
         puts "Checksum verified: #{checksum}"
         FileUtils.rm_rf(flutter_sdk_path)
         FileUtils.mkdir_p(flutter_sdk_path)
-        run_command("ditto -x -k flutter.zip #{flutter_sdk_path}")
-        FileUtils.rm_f("flutter.zip")
+        if flutter_os == "macos"
+            run_command("ditto -x -k #{flutter_archive_file} #{flutter_sdk_path}")
+        else
+            run_command("tar -xJf #{flutter_archive_file} -C #{flutter_sdk_path}")
+        end
+        FileUtils.rm_f(flutter_archive_file)
         File.write(sha_file, release["sha256"])
     end
     flutter_path = "#{flutter_sdk_path}/flutter"
